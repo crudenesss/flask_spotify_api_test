@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+    <title>Flask project</title>
+    <body>
+        <ul>
+            <li><a href='/'>Home</a></li>
+            <li><a href='/releases'>New releases</a></li>
+        </ul>
+        <h1>Welcome to my first Flask project!</h1>
+        <p>Check out my fav artist:</p>
+        <div>
+            <div>
+                <img src={{response.images[1].url}}>
+            </div>
+            <div>
+                <h2>{{response.name}}</h2>
+                <p>{{response.followers.total}} followers on Spotify</p>
+                <p>Genres: 
+                    {% for item in response.genres %}
+                        <text> {{item}} </text>
+                    {% endfor %}
+                </p>
+            </div>
+                
+        </div>
+
+        <p>You can leave here your fav artists too! Just sign up and share with us!</p>
+      
+    </body>
+</html>
