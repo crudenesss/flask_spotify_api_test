@@ -17,24 +17,11 @@ def get_token():
 		'Authorization': f'Basic {b64encode(bytes(client_id+":"+client_secret, "utf-8")).decode("ascii")}',
 		'Content-Type': 'application/x-www-form-urlencoded'}
 	body = {'grant_type': 'client_credentials'}
-	print(headers)
 	post_response = requests.post(token_url, headers=headers, data=body)
 
 	json = post_response.json()
-	print(f"json: {json}")
 	return json['access_token'], json['token_type'], json['expires_in']
 
-
-"""def refresh_token(token):
-	token_url = 'https://accounts.spotify.com/api/token'
-	authorization = config.get('DEFAULT', 'authorization')
-
-	headers = {'Authorization': authorization, 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded'}
-	body = {'refresh_token': token, 'grant_type': 'refresh_token'}
-	post_response = requests.post(token_url, headers=headers, data=body)
-
-	return post_response.json()['access_token'], post_response.json()['expires_in']
-"""
 
 def get_token_status(session):
 	if time.time() > session['token_expiration']:
@@ -47,8 +34,6 @@ def get_token_status(session):
 def make_get_request(session, url, params=None):
 	headers = {"Authorization": f"Bearer {session['token']}"}
 	response = requests.get(url, headers=headers, params=params)
-	print("headers:", headers)
-	print("response:", response)
 
 	if response.status_code == 200:
 		return response.json()
