@@ -5,7 +5,13 @@
         <ul>
             <li><a href='/'>Home</a></li>
             <li><a href='/releases'>New releases</a></li>
-            <li></li>
+            {% if 'username' in s.keys()%}
+                <li><a href='/profile'>{{ s.username }}</a></li>
+                <li><a>Logout</a></li>
+            {% else %}
+                <li><a>Log in</a></li>
+                <li><a href="/register/">Sign up</a></li>
+            {% endif %}
         </ul>
         <h1>New releases</h1>
 

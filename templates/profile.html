@@ -13,23 +13,8 @@
                 <li><a href="/register/">Sign up</a></li>
             {% endif %}
         </ul>
-        <h1>Welcome to my first Flask project!</h1>
+        <h1>{{ s.username }}: Profile</h1>
         <p>Check out my fav artist:</p>
-        <div>
-            <div>
-                <img src={{data.images[1].url}}>
-            </div>
-            <div>
-                <h2>{{data.name}}</h2>
-                <p>{{data.followers.total}} followers on Spotify</p>
-                <p>Genres: 
-                    {% for item in data.genres %}
-                        <text> {{item}} </text>
-                    {% endfor %}
-                </p>
-            </div>
-                
-        </div>
 
         <p>You can leave here your fav artists too! Just sign up and share with us!</p>
       

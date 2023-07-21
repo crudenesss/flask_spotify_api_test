@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+    <title>Flask project</title>
+    <body>
+        <ul>
+            <li><a href='/'>Home</a></li>
+            <li><a href='/releases'>New releases</a></li>
+            <li><a>Log in</a></li>
+            <li><a href='/register/'>Sign up</a></li>
+        </ul>
+        <h1>Sign Up</h1>
+        <br>
+        {% from "_form_build.html" import render_field %}
+        <form method='post' action="/register/">
+            <dl>
+                {{ render_field(form.username) }}
+                {{ render_field(form.password) }}
+                {{ render_field(form.confirm) }}
+            </dl>
+            <button>Sign up</button>
+        </form>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for message in messages %}
+                        {{ message[1] }}
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <p>Already have an account? <a href="/login">Click here!</a></p>
+      
+    </body>
+</html>
