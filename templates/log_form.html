@@ -5,16 +5,28 @@
         <ul>
             <li><a href='/'>Home</a></li>
             <li><a href='/releases'>New releases</a></li>
-            <li><a>Log in</a></li>
+            <li><a href='/login/'>Log in</a></li>
             <li><a href='/register/'>Sign up</a></li>
         </ul>
-        <form method="POST" action="/">
-            <label for="login">Login</label><br>
-            <input type="text" id="login" name="login"><br>
-            <label for="pass">Password</label><br>
-            <input type="text" id="pass" name="pass"><br>
+        <h1>Sign Up</h1>
+        <br>
+
+        {% from "_form_build.html" import render_field %}
+        <form method='post' action="/login/">
+            <dl>
+                {{ render_field(form.username) }}
+                {{ render_field(form.password) }}
+            </dl>
             <button>Log in</button>
         </form>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for message in messages %}
+                        {{ message[1] }}
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
         <p>No account? <a href="/register/">Click here!</a></p>
       

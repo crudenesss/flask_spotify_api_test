@@ -35,15 +35,37 @@ def releases():
 # user profile page
 @app.route('/profile')
 def profile():
-    if 'username' in session.keys():
-        return render_template('profile.html', s=session)
-    else:
-        return redirect(url_for('/'))
+    return render_template('profile.html', s=session)
 
 # login page
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login/', methods=['GET', 'POST'])
 def login():
+    form = LogForm(request.form)
+
+    if request.method != "POST":
+        return render_template('log_form.html', s=session, form=form)
+    
+    if form.validate():
+        username = form.username.data
+        password = form.password.data
+
+        cur.execute("SELECT * FROM users WHERE login=? AND password=?;", (username, password,))
+        check = cur.fetchall()
+        if len(check) != 1:
+            flash("Incorrect login or password.")
+            return render_template('log_form.html', s=session, form=form)
+        else:
+            session['username'] = username
+            return redirect('/')
+
+
     return render_template('log_form.html', s=session)
+
+# logout
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    return redirect('/')
 
 # registration page
 @app.route('/register/', methods=['GET', 'POST'])
@@ -54,7 +76,7 @@ def register():
         return render_template('reg_form.html', s=session, form=form)
     
     if form.validate():
-        username  = form.username.data
+        username = form.username.data
         password = form.password.data
 
         cur.execute("SELECT * FROM users WHERE login=?;", (username, ))
@@ -65,10 +87,11 @@ def register():
         else:
             try:
                 cur.execute("INSERT INTO users (login, password) VALUES (?, ?);", (username, password, ))
+                connection.commit()
                 return render_template('message.html', msg="Registration is completed succesfully!")
             except mariadb.Error as e:
                 return render_template('message.html', msg=e)
     
 
 if __name__ == '__main__':
-    app.run(port=12555, debug=True)
+    app.run(port=12555)
