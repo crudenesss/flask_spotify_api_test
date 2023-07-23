@@ -2,10 +2,16 @@ from flask import redirect, request, session
 from configparser import ConfigParser
 import requests
 import time
+import random as rand
+import string
 from base64 import b64encode
 
 config = ConfigParser()
 config.read('config.cfg')
+
+
+def create_code(size):
+	return ''.join(rand.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(size))
 
 
 def get_token():

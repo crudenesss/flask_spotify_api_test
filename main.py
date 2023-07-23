@@ -4,7 +4,7 @@ from functions import *
 from configparser import ConfigParser
 import mariadb
 import os
-from init_classes import RegForm, LogForm
+from init_classes import RegForm, LogForm, SongForm
 
 config = ConfigParser()
 config.read('config.cfg')
@@ -33,9 +33,79 @@ def releases():
     return render_template('new.html', data=response, s=session)
 
 # user profile page
-@app.route('/profile')
+@app.route('/profile/', methods=['GET', 'POST'])
 def profile():
-    return render_template('profile.html', s=session)
+    form = SongForm(request.form)
+
+    cur.execute(
+        "SELECT item_id, name, album, artist, u_id FROM liked_music JOIN users ON u_id=user_id JOIN songs ON s_id=song_id WHERE login=?;",
+        (session['username'], )
+        )
+    songs = cur.fetchall()
+
+    if request.method == "POST":
+        if form.validate():
+
+            cur.execute("SELECT user_id FROM users WHERE login=?;", (session['username'], ))
+            u_id = cur.fetchall()[0][0]
+
+            title = form.name.data
+            album = form.album.data
+            artist = form.artist.data
+
+            cur.execute(
+                "SELECT * FROM songs WHERE name=? AND album=? AND artist=?;", 
+                (title, album, artist, )
+                )
+            
+            check = cur.fetchall()
+            if len(check) != 0:
+                id = check[0][0]
+                cur.execute(
+                    "SELECT * FROM liked_music WHERE u_id=? AND s_id=?;",
+                    (u_id, id, )
+                    )
+                if len(cur.fetchall()) != 0:
+                    flash("Songs must be different")
+                    return redirect('/profile/')
+                
+            else:
+                id = create_code(16)
+                cur.execute(
+                    "INSERT INTO songs VALUES (?, ?, ?, ?);",
+                    (id, title, album, artist, ))
+            
+            cur.execute(
+                "INSERT INTO liked_music (u_id, s_id) VALUES (?, ?);", 
+                (u_id, id, )
+                )
+            connection.commit()
+
+            return redirect('/profile/')
+
+    return render_template('profile.html', s=session, data=songs, form=form)
+
+# delete song
+@app.route('/profile/<id>', methods=['GET', 'POST'])
+def delete(id):
+    if request.method == "POST":
+        cur.execute(
+            "SELECT * FROM liked_music WHERE s_id IN (SELECT s_id FROM liked_music WHERE item_id=?)",
+            (id, )
+        )
+        if len(cur.fetchall()) > 1:
+            cur.execute(
+                "DELETE FROM liked_music WHERE item_id=?",
+                (id, )
+                )
+        else:
+            cur.execute(
+                "DELETE FROM songs WHERE song_id IN (SELECT s_id FROM liked_music WHERE item_id=?)",
+                (id, )
+            )
+        connection.commit()
+    return redirect('/profile/')
+
 
 # login page
 @app.route('/login/', methods=['GET', 'POST'])
