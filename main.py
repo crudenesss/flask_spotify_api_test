@@ -2,8 +2,7 @@ from flask import Flask, render_template, session, url_for, redirect, flash
 from wtforms import *
 from functions import *
 from configparser import ConfigParser
-import mariadb
-import os
+import mariadb, os, logging
 from init_classes import RegForm, LogForm, SongForm
 
 config = ConfigParser()
@@ -11,6 +10,9 @@ config.read('config.cfg')
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = config.get("DEFAULT", "secret_key")
+
+logging.basicConfig(filename = 'logs.log', 
+    format = '[%(asctime)s]     %(levelname)s     %(name)s : %(message)s')
 
 connection = mariadb.connect(
     user=os.environ.get('username'),
