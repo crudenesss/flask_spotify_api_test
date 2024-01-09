@@ -1,0 +1,53 @@
+version: '3.9'
+
+services:
+  mariadb:
+    container_name: db
+    image: mariadb
+    environment:
+      - MYSQL_DATABASE=spotify_music
+      - MYSQL_USER=<YOUR USERNAME>
+      - MYSQL_PASSWORD=<YOUR USER PASSWORD>
+      - MYSQL_ROOT_PASSWORD=<ROOT PASSWORD>
+    volumes:
+      - db-data:/var/lib/db-data
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb -u <YOUR USERNAME> -p<YOUR USER PASSWORD> spotify_music"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  flask:
+    container_name: flask
+    build: .
+    ports:
+      - "5000:5000"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=<YOUR USERNAME>
+      - DB_PASSWORD=<YOUR USER PASSWORD>
+      - DB_NAME=spotify_music
+      - ID=<ID>
+      - SECRET=<SECRET>
+      - KEY=<YOUR APPLICATION KEY>
+
+  nginx:
+    image: nginx:stable
+    volumes:
+      - ./nginx/http.conf:/etc/nginx/nginx.conf
+      - ./nginx/key.pem:/etc/nginx/key.pem
+      - ./nginx/cert.pem:/etc/nginx/cert.pem
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - flask
+
+volumes:
+  db-data:

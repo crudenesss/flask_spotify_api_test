@@ -14,7 +14,26 @@
             {% endif %}
         </ul>
         <h1>New releases</h1>
-
+        <p>Total: {{ items }}</p>
+        {% for item in data %}
+            <div>
+                <img src='{{ item.images[1].url }}'>
+            </div>
+            <div>
+                <p>{{ item.album_type }}</p>
+                <h2><a href='{{ item.external_urls.spotify }}'>{{ item.name }}</a></h2>
+                <p>
+                    {% for artist in item.artists %}
+                        <a href='{{ artist.external_urls.spotify }}'>{{ artist.name }}</a>
+                    {% endfor %}
+                </p>
+                {% if item.total_tracks > 1 %}
+                    <p>{{ item.total_tracks }} songs<p>
+                {% else %}
+                    <p>{{ item.total_tracks }} song<p>    
+                {% endif %}
+            </div>
+        {% endfor %}
         <h3>Do you like it?</h3>
         <p>Feel free to explore more music and share your preferences with us :3</p>
       
